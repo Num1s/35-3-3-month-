@@ -3,9 +3,8 @@ from aiogram.filters.command import Command
 
 myinfo_router = Router()
 
-@myinfo_router.message(Command("myinfo"))
+@myinfo_router.message(Command('myinfo'))
 async def cmd_myinfo(message: types.Message):
-    # print(
     await message.reply(f"""
     Ваши данные:
     ID: {message.from_user.id}
