@@ -114,6 +114,7 @@ async def button_callback(callback: types.CallbackQuery, state: FSMContext):
         '''
         f.write(description)
     await callback.message.answer('Данные были сохранены.')
+    await state.clear()
 
 @fsmadmin_router.callback_query(F.data == 'no')
 async def button_callback(callback: types.CallbackQuery):
