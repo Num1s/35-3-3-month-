@@ -10,7 +10,6 @@ class Quotes(StatesGroup):
     name = State()
     age = State()
     gender = State()
-    country = State()
     exp = State()
     route = State()
     exp_who = State()
