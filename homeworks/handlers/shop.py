@@ -9,7 +9,7 @@ shop_router = Router()
 db = Database()
 
 pages = []
-page = 0 + 1
+page = 0
 
 
 @shop_router.message(Command('shop'))
