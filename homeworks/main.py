@@ -3,7 +3,13 @@ import logging
 from aiogram.types import BotCommand
 
 from bot import bot, dp
+from db_utils.db_settings import Database
 from handlers import myinfo_router, picture_router, start_router, shop_router, fsmadmin_router
+
+async def db_settings():
+	db = Database()
+	await db.create_table()
+	await db.insert_default_book()
 
 async def main():
 	await bot.set_my_commands([
@@ -13,6 +19,7 @@ async def main():
 		BotCommand(command="myinfo", description="Информация профиля"),
 		BotCommand(command="quest", description="Пройти опрос"),
 	])
+	dp.startup.register(db_settings)
 	dp.include_routers(
 		start_router,
 		myinfo_router,
