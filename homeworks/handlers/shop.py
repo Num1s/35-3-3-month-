@@ -85,7 +85,7 @@ async def cmd_item_1(message: types.Message):
 async def back_page_button(callback: types.CallbackQuery):
 	global pages, page
 	if page == 0:
-		page = len(pages) - 1
+		await callback.answer('Вы на самой начальной странице')
 	else:
 		page -= 1
 	pagination_keyboard = types.InlineKeyboardMarkup(
@@ -112,7 +112,7 @@ async def back_page_button(callback: types.CallbackQuery):
 async def next_page_button(callback: types.CallbackQuery):
 	global pages, page
 	if page == len(pages) - 1:
-		page = 0
+		await callback.answer('Вы дошли до конца страницы')
 	else:
 		page += 1
 	pagination_keyboard = types.InlineKeyboardMarkup(
