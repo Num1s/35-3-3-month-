@@ -9,6 +9,7 @@ from handlers import myinfo_router, picture_router, start_router, shop_router, f
 async def db_settings():
 	db = Database()
 	await db.create_table()
+	await db.insert_default_category()
 	await db.insert_default_book()
 
 async def main():
