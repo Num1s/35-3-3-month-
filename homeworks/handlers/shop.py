@@ -324,5 +324,3 @@ async def cmd_item_4(callback: types.CallbackQuery):
 	await callback.answer('Успешно!')
 	await cmd_start(callback=callback)
 	await callback.message.answer(f'Вы успешно вернулись в начало', reply_markup=r)
-
-

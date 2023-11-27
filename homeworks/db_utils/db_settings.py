@@ -7,6 +7,13 @@ class Database(object):
 	async def create_table(self):
 		async with aiosqlite.connect(self.name) as db:
 			cursor = await db.cursor()
+			query_newsletter = '''CREATE TABLE IF NOT EXISTS newsletter(
+				user_id INTEGER,
+				text_user TEXT,
+				date_start TEXT
+			)
+			'''
+			await cursor.execute(query_newsletter)
 			query_user = '''CREATE TABLE IF NOT EXISTS users(
 				id INTEGER,
 				product_id INTEGER
@@ -63,6 +70,13 @@ class Database(object):
 			await cursor.execute(query, (user, product))
 			await db.commit()
 
+	async def insert_user_scheduler(self, user: int, text: str, date):
+		async with aiosqlite.connect(self.name) as db:
+			cursor = await db.cursor()
+			query = 'INSERT INTO newsletter VALUES (?, ?, ?)'
+			await cursor.execute(query, (user, text, date))
+			await db.commit()
+
 	async def get_user(self, user):
 		async with aiosqlite.connect(self.name) as db:
 			cursor = await db.cursor()
@@ -90,3 +104,10 @@ class Database(object):
 			query = 'SELECT * FROM products WHERE id = ?'
 			await cursor.execute(query, (id_product,))
 			return await cursor.fetchone()
+
+	async def get_users_scheduler(self):
+		async with aiosqlite.connect(self.name) as db:
+			cursor = await db.cursor()
+			query = 'SELECT * FROM newsletter'
+			await cursor.execute(query)
+			return await cursor.fetchall()
