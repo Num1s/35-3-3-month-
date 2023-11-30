@@ -2,11 +2,19 @@ import aiosqlite
 
 class Database(object):
 	def __init__(self):
-		self.name = 'dbs/main.db'
+		self.name = 'C:/Users/user/Documents/Geeks/Backend/month_3/Home-Works/homeworks/dbs/main_bot.db'
 
 	async def create_table(self):
 		async with aiosqlite.connect(self.name) as db:
 			cursor = await db.cursor()
+			query_houses = '''CREATE TABLE IF NOT EXISTS houses(
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				title TEXT,
+				location TEXT,
+				price TEXT,
+				url TEXT
+			)'''
+			await cursor.execute(query_houses)
 			query_newsletter = '''CREATE TABLE IF NOT EXISTS newsletter(
 				user_id INTEGER,
 				text_user TEXT,
@@ -33,6 +41,13 @@ class Database(object):
 				category_id INTEGER,
 				FOREIGN KEY (category_id) REFERENCES category (id)
 			)'''
+			await cursor.execute(query)
+			await db.commit()
+
+	async def drop_table_house(self):
+		async with aiosqlite.connect(self.name) as db:
+			cursor = await db.cursor()
+			query = 'DROP TABLE IF EXISTS houses'
 			await cursor.execute(query)
 			await db.commit()
 
@@ -76,6 +91,33 @@ class Database(object):
 			query = 'INSERT INTO newsletter VALUES (?, ?, ?)'
 			await cursor.execute(query, (user, text, date))
 			await db.commit()
+
+	async def insert_value_in_houses(self, type_, value, id_):
+		async with aiosqlite.connect(self.name) as db:
+			cursor = await db.cursor()
+			if not await self.get_house_id(id_):
+				print(123)
+				query = f'INSERT INTO houses ({type_}) VALUES (?)'
+				await cursor.execute(query, (value,))
+			else:
+				if type_ == 'location':
+					query = 'UPDATE houses SET location = ? WHERE id = ?'
+					await cursor.execute(query, (value, id_,))
+				elif type_ == 'price':
+					query = 'UPDATE houses SET price = ? WHERE id = ?'
+					await cursor.execute(query, (value, id_,))
+				elif type_ == 'url':
+					query = 'UPDATE houses SET url = ? WHERE id = ?'
+					await cursor.execute(query, (value, id_,))
+
+			await db.commit()
+
+	async def get_house_id(self, id_):
+		async with aiosqlite.connect(self.name) as db:
+			cursor = await db.cursor()
+			query = 'SELECT * FROM houses WHERE id = ?'
+			await cursor.execute(query, (id_,))
+			return await cursor.fetchone()
 
 	async def get_user(self, user):
 		async with aiosqlite.connect(self.name) as db:
