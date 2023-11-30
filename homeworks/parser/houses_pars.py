@@ -23,24 +23,23 @@ async def insert_in_table(data: list, type_: str):
             await db.insert_value_in_houses(type_, item, n)
 
 async def parsing_html():
-    for page in range(1, 10):
-        data = await get_html(MAIN_URL + f'/snyat?page={page}')
-        selector = parsel.Selector(text=data)
-        parsing_title = selector.xpath('//div[@class="left-side"]/p[@class="title"]/a/text()').getall()
-        cleaned_title = await clean_text(parsing_title)
-        await insert_in_table(cleaned_title, 'title')
+    data = await get_html(MAIN_URL + f'/snyat')
+    selector = parsel.Selector(text=data)
+    parsing_title = selector.xpath('//div[@class="left-side"]/p[@class="title"]/a/text()').getall()
+    cleaned_title = await clean_text(parsing_title)
+    await insert_in_table(cleaned_title, 'title')
 
-        parsing_location = selector.xpath('//div[@class="left-side"]/div[@class="address"]/text()').getall()
-        cleaned_location = await clean_text(parsing_location)
-        await insert_in_table(cleaned_location, 'location')
+    parsing_location = selector.xpath('//div[@class="left-side"]/div[@class="address"]/text()').getall()
+    cleaned_location = await clean_text(parsing_location)
+    await insert_in_table(cleaned_location, 'location')
 
-        parsing_price = selector.xpath('//div[@class="sep main"]/div[@class="price"]/text()').getall()
-        cleaned_price = await clean_text(parsing_price)
-        await insert_in_table(cleaned_price, 'price')
+    parsing_price = selector.xpath('//div[@class="sep main"]/div[@class="price"]/text()').getall()
+    cleaned_price = await clean_text(parsing_price)
+    await insert_in_table(cleaned_price, 'price')
 
-        parsing_url = selector.xpath('//div[@class="left-image"]/a/@href').getall()
-        cleaned_url = await clean_text(parsing_url)
-        await insert_in_table(cleaned_url, 'url')
+    parsing_url = selector.xpath('//div[@class="left-image"]/a/@href').getall()
+    cleaned_url = await clean_text(parsing_url)
+    await insert_in_table(cleaned_url, 'url')
 
 
 async def start_parser():
