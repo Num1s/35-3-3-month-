@@ -53,6 +53,7 @@ async def cmd_start(message: types.Message = None, callback: types.CallbackQuery
 
     await message.answer(f"Hello! {user} | Выберите опцию в нижней категории!", reply_markup=start_keyboard)
 
+
 class AddScheduler(StatesGroup):
     text = State()
     date = State()

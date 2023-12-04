@@ -1,4 +1,5 @@
 import aiosqlite
+from aiogram import *
 
 class Database(object):
 	def __init__(self):
@@ -7,6 +8,17 @@ class Database(object):
 	async def create_table(self):
 		async with aiosqlite.connect(self.name) as db:
 			cursor = await db.cursor()
+			query_users = '''CREATE TABLE IF NOT EXISTS users(
+				user_id INTEGER,
+				username TEXT
+			)'''
+			await cursor.execute(query_users)
+			query_warns = '''CREATE TABLE IF NOT EXISTS warns(
+				warn_id INTEGER,
+				user_id INTEGER,
+				word TEXT
+			)'''
+			await cursor.execute(query_warns)
 			query_houses = '''CREATE TABLE IF NOT EXISTS houses(
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				title TEXT,
@@ -22,11 +34,11 @@ class Database(object):
 			)
 			'''
 			await cursor.execute(query_newsletter)
-			query_user = '''CREATE TABLE IF NOT EXISTS users(
-				id INTEGER,
-				product_id INTEGER
-			)'''
-			await cursor.execute(query_user)
+			# query_user = '''CREATE TABLE IF NOT EXISTS users(
+			# 	id INTEGER,
+			# 	product_id INTEGER
+			# )'''
+			# await cursor.execute(query_user)
 			query_category = '''CREATE TABLE IF NOT EXISTS categories(
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
 				name TEXT
@@ -112,19 +124,61 @@ class Database(object):
 
 			await db.commit()
 
+	async def insert_user_warn(self, user, word):
+		async with aiosqlite.connect(self.name) as db:
+			cursor = await db.cursor()
+			data = await self.get_user_warn(user, 'one')
+			query = 'INSERT INTO warns VALUES (?, ?, ?)'
+			await cursor.execute(query, (data[0] + 1 if data else 1, user.id, word,))
+			await db.commit()
+
+	async def insert_user(self, user: types.User):
+		async with aiosqlite.connect(self.name) as db:
+			cursor = await db.cursor()
+			if not await self.get_user(user):
+				query = 'INSERT INTO users VALUES (?, ?)'
+				await cursor.execute(query, (user.id, user.username,))
+				await db.commit()
+
+	async def delete_user_warn(self, user):
+		async with aiosqlite.connect(self.name) as db:
+			cursor = await db.cursor()
+			query = 'DELETE FROM warns WHERE user_id = ?'
+			await cursor.execute(query, (user.id,))
+			await db.commit()
+
+	async def get_users(self):
+		async with aiosqlite.connect(self.name) as db:
+			cursor = await db.cursor()
+			query = 'SELECT * FROM users'
+			await cursor.execute(query)
+			return await cursor.fetchall()
+
+	async def get_user(self, user):
+		async with aiosqlite.connect(self.name) as db:
+			cursor = await db.cursor()
+			query = 'SELECT * FROM users WHERE user_id = ?'
+			await cursor.execute(query, (user.id,))
+			return await cursor.fetchone()
+
+	async def get_user_warn(self, user, type):
+		async with aiosqlite.connect(self.name) as db:
+			cursor = await db.cursor()
+			if type == 'all':
+				query = 'SELECT * FROM warns WHERE user_id = ?'
+				await cursor.execute(query, (user.id,))
+
+			elif type == 'one':
+				query = 'SELECT * FROM warns WHERE user_id = ? ORDER BY warn_id DESC'
+				await cursor.execute(query, (user.id,))
+			return await cursor.fetchone() if type == 'one' else await cursor.fetchall()
+
 	async def get_house_id(self, id_):
 		async with aiosqlite.connect(self.name) as db:
 			cursor = await db.cursor()
 			query = 'SELECT * FROM houses WHERE id = ?'
 			await cursor.execute(query, (id_,))
 			return await cursor.fetchone()
-
-	async def get_user(self, user):
-		async with aiosqlite.connect(self.name) as db:
-			cursor = await db.cursor()
-			query = 'SELECT * FROM users WHERE id = ?'
-			await cursor.execute(query, (user,))
-			return await cursor.fetchall()
 
 	async def get_table(self):
 		async with aiosqlite.connect(self.name) as db:
